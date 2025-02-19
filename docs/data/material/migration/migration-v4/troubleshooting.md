@@ -36,7 +36,7 @@ In this specific example, you would need to bump the version of `@mui/x-data-gri
 
 ## Storybook and Emotion
 
-If your project uses Storybook v6.x, you will need to update the `.storybook/main.js` Webpack config to use the most recent version of Emotion:
+If your project uses Storybook v6.x, you will need to update the `.storybook/main.js` webpack config to use the most recent version of Emotion:
 
 ```js
 // .storybook/main.js
@@ -185,7 +185,7 @@ declare module '@mui/styles/defaultTheme' {
 
 ### JavaScript
 
-If you are using an IDE like VSCode which is able to infer types from a `d.ts` file, create `index.d.ts` in your `src` folder and add the following lines of code:
+If you are using an IDE like VS Code which is able to infer types from a `d.ts` file, create `index.d.ts` in your `src` folder and add the following lines of code:
 
 ```js
 // index.d.ts
@@ -290,4 +290,4 @@ For more details, see [this GitHub issue](https://github.com/mui/material-ui/iss
 
 ## Still having problems?
 
-If you're encountering a problem not covered here, please [create a GitHub issue](https://github.com/mui/material-ui/issues/new?assignees=&labels=status%3A+needs+triage&template=1.bug.yml) with this title format: **[Migration] Summary of your issue**.
+If you're encountering a problem not covered here, please [create a GitHub issue](https://github.com/mui/material-ui/issues/new/choose) with this title format: **[Migration] Summary of your issue**.
