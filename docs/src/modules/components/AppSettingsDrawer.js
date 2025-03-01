@@ -1,7 +1,6 @@
 import * as React from 'react';
 import PropTypes from 'prop-types';
-import { styled, useTheme } from '@mui/material/styles';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import { styled, useTheme, useColorScheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -16,16 +15,16 @@ import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness';
 import FormatTextdirectionLToRIcon from '@mui/icons-material/FormatTextdirectionLToR';
 import FormatTextdirectionRToLIcon from '@mui/icons-material/FormatTextdirectionRToL';
-import { useChangeTheme } from 'docs/src/modules/components/ThemeContext';
-import { useTranslate } from 'docs/src/modules/utils/i18n';
+import { useColorSchemeShim, useChangeTheme } from 'docs/src/modules/components/ThemeContext';
+import { useTranslate } from '@mui/docs/i18n';
 
 const Heading = styled(Typography)(({ theme }) => ({
-  margin: '20px 0 10px',
-  color: theme.palette.grey[600],
-  fontWeight: 700,
+  margin: '16px 0 8px',
+  fontWeight: theme.typography.fontWeightSemiBold,
   fontSize: theme.typography.pxToRem(11),
   textTransform: 'uppercase',
-  letterSpacing: '.08rem',
+  letterSpacing: '.1rem',
+  color: (theme.vars || theme).palette.text.tertiary,
 }));
 
 const IconToggleButton = styled(ToggleButton)({
@@ -37,55 +36,91 @@ const IconToggleButton = styled(ToggleButton)({
   },
 });
 
-function AppSettingsDrawer(props) {
-  const { onClose, open = false, ...other } = props;
+function ToggleTheme(props) {
+  const { value, onChange } = props;
   const t = useTranslate();
-  const upperTheme = useTheme();
-  const changeTheme = useChangeTheme();
-  const [mode, setMode] = React.useState(null);
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-  const preferredMode = prefersDarkMode ? 'dark' : 'light';
+  return (
+    <ToggleButtonGroup
+      exclusive
+      value={value}
+      color="primary"
+      onChange={onChange}
+      aria-labelledby="settings-mode"
+      fullWidth
+    >
+      <IconToggleButton
+        value="light"
+        aria-label={t('settings.light')}
+        data-ga-event-category="settings"
+        data-ga-event-action="light"
+      >
+        <LightModeIcon fontSize="small" />
+        {t('settings.light')}
+      </IconToggleButton>
+      <IconToggleButton
+        value="system"
+        aria-label={t('settings.system')}
+        data-ga-event-category="settings"
+        data-ga-event-action="system"
+      >
+        <SettingsBrightnessIcon fontSize="small" />
+        {t('settings.system')}
+      </IconToggleButton>
+      <IconToggleButton
+        value="dark"
+        aria-label={t('settings.dark')}
+        data-ga-event-category="settings"
+        data-ga-event-action="dark"
+      >
+        <DarkModeOutlinedIcon fontSize="small" />
+        {t('settings.dark')}
+      </IconToggleButton>
+    </ToggleButtonGroup>
+  );
+}
+ToggleTheme.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.oneOf(['light', 'system', 'dark']),
+};
 
-  React.useEffect(() => {
-    // syncing with homepage, can be removed once all pages are migrated to CSS variables
-    let initialMode = 'system';
-    try {
-      initialMode = localStorage.getItem('mui-mode') || initialMode;
-    } catch (error) {
-      // do nothing
-    }
-    setMode(initialMode);
-  }, [preferredMode]);
+function ToggleVarTheme(props) {
+  const { setMode } = useColorScheme();
 
   const handleChangeThemeMode = (event, paletteMode) => {
     if (paletteMode === null) {
       return;
     }
-
+    props.onChange(event, paletteMode);
     setMode(paletteMode);
+  };
+  return <ToggleTheme value={props.value} onChange={handleChangeThemeMode} />;
+}
 
-    if (paletteMode === 'system') {
-      try {
-        localStorage.setItem('mui-mode', 'system'); // syncing with homepage, can be removed once all pages are migrated to CSS variables
-      } catch (error) {
-        // thrown when cookies are disabled.
-      }
-      changeTheme({ paletteMode: preferredMode });
-    } else {
-      try {
-        localStorage.setItem('mui-mode', paletteMode); // syncing with homepage, can be removed once all pages are migrated to CSS variables
-      } catch (error) {
-        // thrown when cookies are disabled.
-      }
-      changeTheme({ paletteMode });
+ToggleVarTheme.propTypes = {
+  onChange: PropTypes.func.isRequired,
+  value: PropTypes.oneOf(['light', 'system', 'dark']),
+};
+
+export default function AppSettingsDrawer(props) {
+  const { onClose, open = false, ...other } = props;
+  const t = useTranslate();
+  const upperTheme = useTheme();
+  const changeTheme = useChangeTheme();
+
+  // TODO replace with useColorScheme once all pages support css vars
+  const { mode, setMode } = useColorSchemeShim();
+
+  const handleChangeThemeMode = (event, paletteMode) => {
+    if (paletteMode === null) {
+      return;
     }
+    setMode(paletteMode);
   };
 
   const handleChangeDirection = (event, direction) => {
     if (direction === null) {
       direction = upperTheme.direction;
     }
-
     changeTheme({ direction });
   };
 
@@ -96,12 +131,25 @@ function AppSettingsDrawer(props) {
       open={open}
       PaperProps={{
         elevation: 0,
-        sx: { width: { xs: 310, sm: 360 }, borderRadius: '10px 0px 0px 10px' },
+        sx: {
+          width: { xs: 310, sm: 360 },
+          borderRadius: '10px 0px 0px 10px',
+          border: '1px solid',
+          borderColor: 'divider',
+        },
       }}
       {...other}
     >
-      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', p: 2 }}>
-        <Typography variant="body1" fontWeight="500">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          px: 2,
+          py: 1,
+        }}
+      >
+        <Typography variant="body1" sx={{ fontWeight: 'medium' }}>
           {t('settings.settings')}
         </Typography>
         <IconButton color="inherit" onClick={onClose} edge="end" aria-label={t('close')}>
@@ -113,42 +161,11 @@ function AppSettingsDrawer(props) {
         <Heading gutterBottom id="settings-mode">
           {t('settings.mode')}
         </Heading>
-        <ToggleButtonGroup
-          exclusive
-          value={mode}
-          color="primary"
-          onChange={handleChangeThemeMode}
-          aria-labelledby="settings-mode"
-          fullWidth
-        >
-          <IconToggleButton
-            value="light"
-            aria-label={t('settings.light')}
-            data-ga-event-category="settings"
-            data-ga-event-action="light"
-          >
-            <LightModeIcon fontSize="small" />
-            {t('settings.light')}
-          </IconToggleButton>
-          <IconToggleButton
-            value="system"
-            aria-label={t('settings.system')}
-            data-ga-event-category="settings"
-            data-ga-event-action="system"
-          >
-            <SettingsBrightnessIcon fontSize="small" />
-            {t('settings.system')}
-          </IconToggleButton>
-          <IconToggleButton
-            value="dark"
-            aria-label={t('settings.dark')}
-            data-ga-event-category="settings"
-            data-ga-event-action="dark"
-          >
-            <DarkModeOutlinedIcon fontSize="small" />
-            {t('settings.dark')}
-          </IconToggleButton>
-        </ToggleButtonGroup>
+        {upperTheme.vars ? (
+          <ToggleVarTheme value={mode} onChange={handleChangeThemeMode} />
+        ) : (
+          <ToggleTheme value={mode} onChange={handleChangeThemeMode} />
+        )}
         <Heading gutterBottom id="settings-direction">
           {t('settings.direction')}
         </Heading>
@@ -185,11 +202,11 @@ function AppSettingsDrawer(props) {
           href="/material-ui/customization/color/#playground"
           data-ga-event-category="settings"
           data-ga-event-action="colors"
-          size="medium"
           variant="outlined"
+          size="small"
           fullWidth
         >
-          {t('settings.editWebsiteColors')}
+          {t('settings.editDocsColors')}
         </Button>
       </Box>
     </Drawer>
@@ -200,5 +217,3 @@ AppSettingsDrawer.propTypes = {
   onClose: PropTypes.func.isRequired,
   open: PropTypes.bool,
 };
-
-export default AppSettingsDrawer;

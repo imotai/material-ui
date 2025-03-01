@@ -20,7 +20,7 @@ const inputComponents = [
     link: '/material-ui/react-button/',
     md1: false,
     md2: true,
-    md3: true,
+    md3: false,
     noGuidelines: false,
   },
   {
@@ -90,7 +90,7 @@ const inputComponents = [
     link: '/material-ui/react-slider/',
     md1: false,
     md2: true,
-    md3: true,
+    md3: false,
     noGuidelines: false,
   },
   {
@@ -139,7 +139,14 @@ export default function MaterialInputComponents() {
   return (
     <Grid container spacing={2} sx={{ pt: 1 }}>
       {inputComponents.map(({ name, link, srcLight, srcDark, md1, md2, md3, noGuidelines }) => (
-        <Grid item xs={12} sm={4} sx={{ flexGrow: 1 }} key={name}>
+        <Grid
+          sx={{ flexGrow: 1 }}
+          key={name}
+          size={{
+            xs: 12,
+            sm: 4,
+          }}
+        >
           <ComponentShowcaseCard
             link={link}
             name={name}

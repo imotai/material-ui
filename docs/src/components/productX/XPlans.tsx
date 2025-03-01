@@ -6,7 +6,7 @@ import Section from 'docs/src/layouts/Section';
 import SectionHeadline from 'docs/src/components/typography/SectionHeadline';
 import GradientText from 'docs/src/components/typography/GradientText';
 import ROUTES from 'docs/src/route';
-import InfoCard from 'docs/src/components/action/InfoCard';
+import { InfoCard } from '@mui/docs/InfoCard';
 import IconImage from 'docs/src/components/icon/IconImage';
 import GetStartedButtons from 'docs/src/components/home/GetStartedButtons';
 
@@ -38,7 +38,7 @@ export default function XPlans2() {
   return (
     <Section cozy>
       <Grid container spacing={2} alignItems="center">
-        <Grid item md={6}>
+        <Grid size={{ md: 6 }}>
           <SectionHeadline
             overline="Plans"
             title={
@@ -55,10 +55,16 @@ export default function XPlans2() {
             secondaryUrl={ROUTES.xLicensing}
           />
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <Stack spacing={2} useFlexGap>
             {content.map(({ icon, title, description, link }) => (
-              <InfoCard dense title={title} icon={icon} description={description} link={link} />
+              <InfoCard
+                key={title}
+                title={title}
+                icon={icon}
+                description={description}
+                link={link}
+              />
             ))}
           </Stack>
         </Grid>

@@ -4,7 +4,7 @@ import CardMedia from '@mui/material/CardMedia';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { alpha } from '@mui/material/styles';
-import Link from 'docs/src/modules/components/Link';
+import { Link } from '@mui/docs/Link';
 
 function components() {
   return [
@@ -136,7 +136,14 @@ export default function BaseUIComponents() {
   return (
     <Grid container spacing={2} sx={{ pt: 2, pb: 4 }}>
       {components().map((component, index) => (
-        <Grid item xs={12} sm={4} sx={{ flexGrow: 1 }} key={component.title}>
+        <Grid
+          sx={{ flexGrow: 1 }}
+          key={component.title}
+          size={{
+            xs: 12,
+            sm: 4,
+          }}
+        >
           <Card
             component={Link}
             noLinkStyle
@@ -175,8 +182,7 @@ export default function BaseUIComponents() {
             <Typography
               component="h2"
               variant="body2"
-              fontWeight="semiBold"
-              sx={{ px: 2, py: 1.5 }}
+              sx={{ fontWeight: 'semiBold', px: 2, py: 1.5 }}
             >
               {component.title}
             </Typography>

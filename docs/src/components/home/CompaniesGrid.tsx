@@ -54,12 +54,12 @@ export const ADVANCED_CUSTOMERS: Array<IconImageProps> = [
     },
   },
   {
-    alt: 'Boeing logo',
-    name: 'companies/boeing',
-    width: 160,
-    height: 86,
+    alt: 'Tesla logo',
+    name: 'companies/tesla',
+    width: 140,
+    height: 52,
     style: {
-      marginTop: -23,
+      marginTop: -11,
     },
   },
   {
@@ -189,16 +189,13 @@ export default function CompaniesGrid({ data }: { data: Array<IconImageProps> })
       {data.map((imgProps) => (
         <Grid
           key={imgProps.name}
-          item
-          xs={6}
-          sm={4}
-          md={2}
           sx={{
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
             objectFit: 'contain',
           }}
+          size={{ xs: 6, sm: 4, md: 2 }}
         >
           <IconImage alt={imgProps.alt} loading="eager" {...imgProps} />
         </Grid>
